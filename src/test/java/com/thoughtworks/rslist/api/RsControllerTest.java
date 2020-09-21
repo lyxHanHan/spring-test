@@ -1,11 +1,14 @@
 package com.thoughtworks.rslist.api;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.thoughtworks.rslist.domain.Trade;
 import com.thoughtworks.rslist.dto.RsEventDto;
 import com.thoughtworks.rslist.dto.UserDto;
 import com.thoughtworks.rslist.dto.VoteDto;
 import com.thoughtworks.rslist.repository.RsEventRepository;
 import com.thoughtworks.rslist.repository.UserRepository;
 import com.thoughtworks.rslist.repository.VoteRepository;
+import com.thoughtworks.rslist.service.RsService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -36,6 +39,7 @@ class RsControllerTest {
   @Autowired RsEventRepository rsEventRepository;
   @Autowired VoteRepository voteRepository;
   private UserDto userDto;
+  private RsService rsService;
 
   @BeforeEach
   void setUp() {
@@ -185,4 +189,17 @@ class RsControllerTest {
     assertEquals(voteDtos.size(), 1);
     assertEquals(voteDtos.get(0).getNum(), 1);
   }
+
+  @Test
+  public void should_buy_rsEvent() throws Exception{
+    UserDto save = userRepository.save(userDto);
+    RsEventDto rsEventDto = RsEventDto.builder().keyword("热搜").eventName("买热搜事件").rank(rsService.getRsEventRank()).build();
+    rsEventDto = rsEventRepository.save(rsEventDto);
+    Trade trade = new Trade (50,1);
+    ObjectMapper objectMapper = new ObjectMapper();
+    String jsonValue = objectMapper.writeValueAsString(trade);
+    mockMvc.perform(post("/rs/buy/{id}",rsEventDto.getId()).content(jsonValue).contentType(MediaType.APPLICATION_JSON))
+            .andExpect(status().isOk());
+  }
 }
+

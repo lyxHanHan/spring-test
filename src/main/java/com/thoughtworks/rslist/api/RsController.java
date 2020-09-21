@@ -28,7 +28,7 @@ import java.util.stream.Collectors;
 
 @RestController
 @Validated
-public class RsController {
+public class  RsController {
   @Autowired RsEventRepository rsEventRepository;
   @Autowired UserRepository userRepository;
   @Autowired RsService rsService;
